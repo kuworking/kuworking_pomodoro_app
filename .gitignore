@@ -1,0 +1,8 @@
+node_modules
+.cache
+public
+yarn.lock
+yarn-error.log
+.linaria-cache
+playwright/
+webfonts.env.json
