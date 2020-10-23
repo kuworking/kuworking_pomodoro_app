@@ -1,8 +1,30 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { Global, css } from '@emotion/core'
 import styled from '@emotion/styled'
 
-import { Layout } from '../../src/components/layout'
-import { SPACE } from '../../src/components/shared'
+import { useThemeSwitch } from './hooks/usethemeswitch'
+
+const GlobalStyles = () => (
+  <Global
+    styles={css`
+      html {
+        background-size: cover;
+        box-sizing: border-box;
+        height: 100%;
+        min-height: 100%;
+        font-size: 62.5%;
+      }
+      body {
+        font-family: 'Open Sans';
+        font-family: 'Source Sans Pro', sans-serif;
+        text-rendering: optimizeLegibility;
+        margin: 0;
+        font-size: 16px; /* fallback for rem */
+        font-size: 1.6rem;
+      }
+    `}
+  />
+)
 
 // https://overreacted.io/making-setinterval-declarative-with-react-hooks/
 // Because setInterval and React have different ways of doing things
@@ -26,13 +48,13 @@ const useInterval = (callback, delay) => {
   }, [delay]) // re-run when delay changes
 }
 
-const Tool = ({ pageContext }) => {
-  const main_maxwidth = '1080px' /* 200 x 5 + 20 x 4, manually, to adjust the topbar to the width used here */
+const Tool = () => {
+  const [colorMode, ThemeSwitch] = useThemeSwitch()
 
   /* radio button logic */
   /* ------------------ */
   const [checked, setChecked] = useState(0) /* values from 0 to 4 */
-  const starting_audio = typeof window !== 'undefined' ? new Audio('tools/pomodoro/chime00.mp3') : ''
+  const starting_audio = typeof window !== 'undefined' ? new Audio('audio/chime00.mp3') : ''
   const [audio, setAudio] = useState(starting_audio)
 
   useEffect(() => {
@@ -41,7 +63,7 @@ const Tool = ({ pageContext }) => {
 
   const radio_select = value => {
     setChecked(value)
-    let new_audio = new Audio('tools/pomodoro/chime0' + value + '.mp3') // need to be loaded here that tab is for sure active
+    let new_audio = new Audio('audio/chime0' + value + '.mp3') // need to be loaded here that tab is for sure active
     setAudio(new_audio)
   }
   /* ------------------ */
@@ -80,92 +102,95 @@ const Tool = ({ pageContext }) => {
   }
   /* ------------------ */
 
-  const seoProps = {
-    ...pageContext.schema,
-    content_type_og: 'website',
-    title: 'Pomodoro Timer',
-    description: 'Work better tracking your productivity with Pomodoro Timers, here you have an online tool',
-    keywords: ['kuworking.com', 'online', 'resource', 'web', 'pomodoro', 'timer', 'productivity'],
-    robots: 'index, follow',
-    image: 'https://www.kuworking.com/global/kuworking.jpg',
-  }
-
-  const maxWidth = '1080px'
-  const layout_props = { pageContext, seoProps, maxWidth }
-
   return (
-    <Layout {...layout_props}>
-      <Text>
-        <h1>
-          <em>POMODORO TIMER</em>
-        </h1>
-      </Text>
+    <Layout>
+      <GlobalStyles />
+      <div>
+        <Text>
+          <h1>
+            <em>POMODORO TIMER</em>
+          </h1>
+          <ThemeSwitch />
+        </Text>
 
-      <Title>
-        <div>Trabaja en tramos de 25 min</div>
-        <div>Toma un descanso de 5 min entre tramos</div>
-        <div>Después de 4 pomodoros, toma un descanso de 15 min</div>
-      </Title>
+        <Title>
+          <div>Trabaja en tramos de 25 min</div>
+          <div>Toma un descanso de 5 min entre tramos</div>
+          <div>Después de 4 pomodoros, toma un descanso de 15 min</div>
+        </Title>
 
-      <Timer>
-        {minutes > 9 ? minutes : '0' + minutes} : {seconds > 9 ? seconds : '0' + seconds}
-      </Timer>
+        <Timer>
+          {minutes > 9 ? minutes : '0' + minutes} : {seconds > 9 ? seconds : '0' + seconds}
+        </Timer>
 
-      <Grid>
-        <Box onClick={() => start_counter(25)}>
-          <>
-            <div>TRAMO</div>
-            <div>START</div>
-            <div>25 min</div>
-          </>
-        </Box>
-        <Box onClick={() => start_counter(5)}>
-          <>
-            <div>MINI BREAK</div>
-            <div>START</div>
-            <div>5 min</div>
-          </>
-        </Box>
-        <Box onClick={() => start_counter(15)}>
-          <>
-            <div>BREAK</div>
-            <div>START</div>
-            <div>15 min</div>
-          </>
-        </Box>
-        <Box2>
-          {[...Array(5).keys()].map((el, i) => (
-            <Radio key={i}>
-              <label>
-                <input
-                  type="radio"
-                  onChange={() => radio_select(i)}
-                  name="audio"
-                  value={i}
-                  checked={checked === i}
-                  aria-checked={checked === i}
-                />
-                <span></span>
-                <span>Audio 0{i + 1}</span>
-              </label>
-            </Radio>
-          ))}
-        </Box2>
-      </Grid>
-
-      <SPACE blk space="40px" />
+        <Grid>
+          <Box onClick={() => start_counter(25)}>
+            <>
+              <div>TRAMO</div>
+              <div>START</div>
+              <div>25 min</div>
+            </>
+          </Box>
+          <Box onClick={() => start_counter(5)}>
+            <>
+              <div>MINI BREAK</div>
+              <div>START</div>
+              <div>5 min</div>
+            </>
+          </Box>
+          <Box onClick={() => start_counter(15)}>
+            <>
+              <div>BREAK</div>
+              <div>START</div>
+              <div>15 min</div>
+            </>
+          </Box>
+          <Box2>
+            {[...Array(5).keys()].map((el, i) => (
+              <Radio key={i}>
+                <label>
+                  <input
+                    type="radio"
+                    onChange={() => radio_select(i)}
+                    name="audio"
+                    value={i}
+                    checked={checked === i}
+                    aria-checked={checked === i}
+                  />
+                  <span></span>
+                  <span>Audio 0{i + 1}</span>
+                </label>
+              </Radio>
+            ))}
+          </Box2>
+        </Grid>
+      </div>
     </Layout>
   )
 }
 
 export default Tool
 
-const Div = styled.main`
+const q = u => `@media (min-width: ${u}px)`
+const qq = u => `@media (max-width: ${u}px)`
+
+const Layout = styled.main`
   display: flex;
-  min-height: 100vh; /* needed for the sticky footer */
-  flex-direction: column;
-  flex-wrap: nowrap;
   align-items: center;
+  justify-content: center;
+
+  transition: 0.2s all ease-in;
+  background: ${props => props.theme.color_background};
+  color: ${props => props.theme.color_text};
+
+  & > div {
+    max-width: 1000px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: center;
+    margin: 50px;
+  }
 `
 
 const Radio = styled.div`
@@ -281,26 +306,17 @@ const Timer = styled.div`
 
 const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(4, 235px);
-  grid-column-gap: 40px;
   justify-items: center;
   justify-content: space-evenly;
 
-  @media (max-width: calc(235px * 4 + 40px * 3 + 20px)) {
-    grid-template-columns: repeat(3, 235px);
-    grid-column-gap: auto;
-    grid-row-gap: 40px;
-  }
+  grid-row-gap: 30px;
 
-  @media (max-width: calc(235px * 3 + 40px * 3 + 20px)) {
-    grid-template-columns: repeat(2, 235px);
-  }
+  grid-template-columns: repeat(2, 1fr);
+  grid-column-gap: 5px;
 
-  @media (max-width: calc(235px * 2 + 40px * 3 + 20px)) {
-    grid-template-columns: repeat(2, 1fr);
-    grid-column-gap: 5px;
-    grid-row-gap: 30px;
-    width: 100%;
+  ${q(500)} {
+    grid-template-columns: repeat(4, 235px);
+    grid-column-gap: 40px;
   }
 `
 

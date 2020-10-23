@@ -1,4 +1,6 @@
-const gtm = ''
+const fs = require('fs')
+
+const gtm = process.env.gtm || JSON.parse(fs.readFileSync('./gtm.env.json', 'utf-8')).api
 
 const manifest = {
   name: 'kuworking',
@@ -15,12 +17,11 @@ const metadata = {
   name: 'kuworking',
   site: 'kuworking',
   title: 'kuworking', // needed for gatsby-plugin-feed
-  description: 'React, WordPress and Svelte',
+  description: 'Pomodoro clock',
   siteUrl: 'https://www.kuworking.com',
   site_lang: `es`,
   social: {
     twitter: '@kuworking',
-    facebook: 'https://www.facebook.com/kuworkingJS/',
   },
   keywords: ['react', 'svelte', 'gatsby', 'next', `wordpress`, `javascript`, `css`],
 }
@@ -28,14 +29,6 @@ const metadata = {
 module.exports = {
   siteMetadata: metadata,
   plugins: [
-    {
-      resolve: `gatsby-source-filesystem`,
-      options: {
-        path: `content/tools`,
-        name: `content/tools`,
-      },
-    },
-
     `gatsby-plugin-react-helmet`,
     {
       resolve: `gatsby-plugin-google-tagmanager`,

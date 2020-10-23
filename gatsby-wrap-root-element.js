@@ -1,5 +1,4 @@
 import React from 'react'
-import { domprogress } from './src/components/shared'
 import { ProvideTheme } from './src/components/theme/provider'
 import '@openfonts/kulim-park_latin'
 
@@ -10,12 +9,7 @@ import '@openfonts/kulim-park_latin'
 // Provide context with the layout-component <ProvideAuth>
 
 export const wrapRootElement = ({ element }) => {
-  return (
-    <ProvideTheme>
-      {element}
-      {domprogress.element()}
-    </ProvideTheme>
-  )
+  return <ProvideTheme>{element}</ProvideTheme>
 }
 
 /*
@@ -25,5 +19,5 @@ export const wrapRootElement = ({ element }) => {
 // Provide styled outside mdx files frmo theme-ui
 export const wrapPageElement = ({ element }) => <>{element}</>
 
-export const onRouteUpdateDelayed = () => domprogress.start()
-export const onRouteUpdate = () => domprogress.done()
+export const onRouteUpdateDelayed = () => {}
+export const onRouteUpdate = () => {}
