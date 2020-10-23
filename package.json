@@ -11,8 +11,8 @@
   "dependencies": {
     "@emotion/core": "10.0.35",
     "@emotion/styled": "10.0.27",
-    "@openfonts/kulim-park_latin": "1.0.2",
     "emotion-theming": "10.0.27",
+    "fontsource-staatliches": "^3.0.10",
     "gatsby": "2.24.63",
     "gatsby-plugin-emotion": "4.3.11",
     "gatsby-plugin-google-tagmanager": "2.3.12",
@@ -30,7 +30,6 @@
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "7.10.4",
     "babel-eslint": "10.1.0",
-    "node-fetch": "2.6.1",
     "babel-plugin-emotion": "10.0.33",
     "eslint": "7.10.0",
     "eslint-config-prettier": "6.12.0",
@@ -42,6 +41,7 @@
     "eslint-plugin-react": "7.20.6",
     "eslint-plugin-standard": "4.0.1",
     "gatsby-plugin-webpack-bundle-analyser-v2": "1.1.12",
+    "node-fetch": "2.6.1",
     "prettier": "2.1.2"
   },
   "scripts": {

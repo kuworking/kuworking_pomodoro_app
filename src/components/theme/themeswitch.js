@@ -2,22 +2,19 @@ import React from 'react'
 import styled from '@emotion/styled'
 import { useTheme } from '../theme/provider'
 
-export const useThemeSwitch = () => {
+export const ThemeSwitch = () => {
   const { mode, toogle } = useTheme()
 
-  return [
-    mode,
-    () => (
-      <Div day={mode === 'light'} onClick={toogle} id="gtm_switch_DayNight_1">
-        <div id="gtm_switch_DayNight_2">
-          <div id="gtm_switch_DayNight_3">
-            <img src="/global/moon.svg" alt="noche" />
-            <img src="/global/sun.svg" alt="día" />
-          </div>
+  return (
+    <Div day={mode === 'light'} onClick={toogle} id="gtm_switch_DayNight_1">
+      <div id="gtm_switch_DayNight_2">
+        <div id="gtm_switch_DayNight_3">
+          <img src="/moon.svg" alt="night" />
+          <img src="/sun.svg" alt="day" />
         </div>
-      </Div>
-    ),
-  ]
+      </div>
+    </Div>
+  )
 }
 
 const Div = styled.div`

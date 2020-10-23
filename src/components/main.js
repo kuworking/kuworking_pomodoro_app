@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Global, css } from '@emotion/core'
 import styled from '@emotion/styled'
 
-import { useThemeSwitch } from './hooks/usethemeswitch'
+import { ThemeSwitch } from './theme/themeswitch'
 
 const GlobalStyles = () => (
   <Global
@@ -15,8 +15,7 @@ const GlobalStyles = () => (
         font-size: 62.5%;
       }
       body {
-        font-family: 'Open Sans';
-        font-family: 'Source Sans Pro', sans-serif;
+        font-family: 'Staatliches';
         text-rendering: optimizeLegibility;
         margin: 0;
         font-size: 16px; /* fallback for rem */
@@ -48,28 +47,7 @@ const useInterval = (callback, delay) => {
   }, [delay]) // re-run when delay changes
 }
 
-const Tool = () => {
-  const [colorMode, ThemeSwitch] = useThemeSwitch()
-
-  /* radio button logic */
-  /* ------------------ */
-  const [checked, setChecked] = useState(0) /* values from 0 to 4 */
-  const starting_audio = typeof window !== 'undefined' ? new Audio('audio/chime00.mp3') : ''
-  const [audio, setAudio] = useState(starting_audio)
-
-  useEffect(() => {
-    audio.play()
-  }, [audio])
-
-  const radio_select = value => {
-    setChecked(value)
-    let new_audio = new Audio('audio/chime0' + value + '.mp3') // need to be loaded here that tab is for sure active
-    setAudio(new_audio)
-  }
-  /* ------------------ */
-
-  /* time logic */
-  /* ------------------ */
+const useTimer = () => {
   const [counter, setCounter] = useState(0)
   const [segment, setSegment] = useState('')
   const [minutes, setMinutes] = useState(0)
@@ -100,70 +78,93 @@ const Tool = () => {
     setSegment(time * 60 * 1000)
     setStart(true)
   }
+
+  return [
+    start_counter,
+    () => (
+      <div className="timer">
+        {minutes > 9 ? minutes : '0' + minutes} : {seconds > 9 ? seconds : '0' + seconds}
+      </div>
+    ),
+  ]
+}
+
+const Tool = () => {
+  const [start_counter, Timer] = useTimer()
+
+  /* radio button logic */
+  /* ------------------ */
+  const [checked, setChecked] = useState(0) /* values from 0 to 4 */
+  const starting_audio = typeof window !== 'undefined' ? new Audio('audio/chime00.mp3') : ''
+  const [audio, setAudio] = useState(starting_audio)
+
+  useEffect(() => {
+    try {
+      audio.play()
+    } catch (e) {}
+  }, [audio])
+
+  const radio_select = value => {
+    setChecked(value)
+    let new_audio = new Audio('audio/chime0' + value + '.mp3') // need to be loaded here that tab is for sure active
+    setAudio(new_audio)
+  }
   /* ------------------ */
 
   return (
     <Layout>
       <GlobalStyles />
       <div>
-        <Text>
-          <h1>
-            <em>POMODORO TIMER</em>
-          </h1>
-          <ThemeSwitch />
-        </Text>
+        <ThemeSwitch />
 
-        <Title>
-          <div>Trabaja en tramos de 25 min</div>
-          <div>Toma un descanso de 5 min entre tramos</div>
-          <div>Después de 4 pomodoros, toma un descanso de 15 min</div>
-        </Title>
+        <div className="grid">
+          <div className="header">
+            <h1>POMODORO TIMER</h1>
+            <div>kuworking.com</div>
+          </div>
 
-        <Timer>
-          {minutes > 9 ? minutes : '0' + minutes} : {seconds > 9 ? seconds : '0' + seconds}
-        </Timer>
+          <div className="minigrid">
+            <div className="title">
+              <div>25 min blocks</div>
+              <div>5 min break after 1 block</div>
+              <div>15 min break after 4 blocks</div>
+            </div>
 
-        <Grid>
-          <Box onClick={() => start_counter(25)}>
-            <>
-              <div>TRAMO</div>
-              <div>START</div>
-              <div>25 min</div>
-            </>
+            <div className="audios">
+              {[...Array(5).keys()].map((el, i) => (
+                <Radio key={i}>
+                  <label>
+                    <input
+                      type="radio"
+                      onChange={() => radio_select(i)}
+                      name="audio"
+                      value={i}
+                      checked={checked === i}
+                      aria-checked={checked === i}
+                    />
+                    <span></span>
+                    <span>0{i + 1}</span>
+                  </label>
+                </Radio>
+              ))}
+            </div>
+          </div>
+
+          <Timer />
+
+          <Box onClick={() => start_counter(25)} style={{ gridColumn: '1/3' }} bg="#c6f3f3" c="#585858">
+            <div>BLOCK</div>
+            <div>25 min</div>
           </Box>
-          <Box onClick={() => start_counter(5)}>
-            <>
-              <div>MINI BREAK</div>
-              <div>START</div>
-              <div>5 min</div>
-            </>
+          <Box onClick={() => start_counter(5)} bg="#ff8477">
+            <div>5 BREAK</div>
+            <div>5 min</div>
           </Box>
-          <Box onClick={() => start_counter(15)}>
-            <>
-              <div>BREAK</div>
-              <div>START</div>
-              <div>15 min</div>
-            </>
+          <Box onClick={() => start_counter(15)} bg="#ff8477">
+            <div>15 BREAK</div>
+            <div>15 min</div>
           </Box>
-          <Box2>
-            {[...Array(5).keys()].map((el, i) => (
-              <Radio key={i}>
-                <label>
-                  <input
-                    type="radio"
-                    onChange={() => radio_select(i)}
-                    name="audio"
-                    value={i}
-                    checked={checked === i}
-                    aria-checked={checked === i}
-                  />
-                  <span></span>
-                  <span>Audio 0{i + 1}</span>
-                </label>
-              </Radio>
-            ))}
-          </Box2>
-        </Grid>
+        </div>
       </div>
     </Layout>
   )
@@ -178,34 +179,162 @@ const Layout = styled.main`
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 100vh;
 
   transition: 0.2s all ease-in;
   background: ${props => props.theme.color_background};
   color: ${props => props.theme.color_text};
 
   & > div {
-    max-width: 1000px;
+    max-width: 500px;
+    width: 100%;
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
     align-items: center;
-    margin: 50px;
+    margin: 10px;
+
+    & > div.grid {
+      display: grid;
+      grid-template-columns: auto auto;
+      grid-gap: 10px;
+      width: 100%;
+
+      & > div.header {
+        grid-column: 1/3;
+        background: #e8e8e8;
+        color: #ffffff;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        & > h1 {
+          margin: 0;
+          text-shadow: 1px 0px 1px #000;
+
+          border-radius: 3px;
+          padding: 10px;
+
+          font-size: 3.3rem;
+          ${q(400)} {
+            font-size: 4.4rem;
+          }
+          ${q(500)} {
+            font-size: 5rem;
+          }
+        }
+
+        & > div {
+          color: #000;
+        }
+      }
+
+      & > div.minigrid {
+        grid-column: 1/3;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        grid-gap: 10px;
+
+        & > div.title {
+          background-color: #e8e8e8;
+          color: #7d7d7d;
+
+          align-items: center;
+          justify-content: center;
+          align-content: center;
+          display: grid;
+          border-radius: 3px;
+
+          font-size: 1.5rem;
+          padding: 0 10px;
+          ${q(500)} {
+            padding: 0 40px;
+          }
+        }
+
+        & > div.audios {
+          background: #e8e8e8;
+          color: #7d7d7d;
+
+          width: 50px;
+          ${q(400)} {
+            width: 100px;
+          }
+          height: fit-content;
+          border-radius: 3px;
+          text-transform: uppercase;
+          text-align: center;
+          padding: 5px;
+
+          font-size: 1.5rem;
+        }
+      }
+
+      & > div.timer {
+        grid-column: 1/3;
+
+        grid-column: 1/3;
+        height: 200px;
+        border-radius: 3px;
+        border: 1px solid #ccc;
+        align-items: center;
+        justify-content: center;
+        display: flex;
+        font-size: 10rem;
+        color: #fff;
+        text-shadow: 1px 1px 3px #000;
+      }
+    }
+  }
+`
+
+const Box = styled.div`
+  border-radius: 3px;
+  color: ${p => p.c || '#fff'};
+
+  font-weight: 700;
+  padding: 10px;
+
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+
+  font-size: 1.5rem;
+  ${q(400)} {
+    font-size: 1.7rem;
+  }
+  ${q(500)} {
+    font-size: 2rem;
+  }
+
+  background: ${p => p.bg};
+  cursor: pointer;
+
+  & > div:nth-of-type(1) {
+    font-size: 2em;
+  }
+
+  &:hover {
+    background: #ccc;
   }
 `
 
 const Radio = styled.div`
-  margin: 5px;
+  margin: 3px;
   cursor: pointer;
-  width: ${props => (props.size ? props.size : 20)}px;
-  height: ${props => (props.size ? props.size : 20)}px;
+  width: 15px;
+  height: 15px;
   position: relative;
   display: flex;
 
   &::before {
     content: '';
     border-radius: 100%;
-    border: 5px solid #349bff;
-    background: #000000;
+    border: 2px solid #ccc;
+    background: #fff;
     width: 100%;
     height: 100%;
     position: absolute;
@@ -216,7 +345,7 @@ const Radio = styled.div`
   }
 
   & > label {
-    padding-left: 25px;
+    padding-left: 20px;
     cursor: pointer;
 
     & > input {
@@ -251,13 +380,13 @@ const Radio = styled.div`
       &::before {
         content: '';
         opacity: 0;
-        width: calc(20px - 4px);
+        width: calc(15px - 4px);
         position: absolute;
-        height: calc(20px - 4px);
+        height: calc(15px - 4px);
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        border: 5px solid #fff;
+        border: 1px solid #ff8477;
         border-radius: 100%;
       }
     }
@@ -277,174 +406,5 @@ const Radio = styled.div`
       display: inline-block;
       width: max-content;
     }
-  }
-`
-
-const Timer = styled.div`
-  height: 300px;
-  border-radius: 15px;
-  border: 9px solid #000;
-  background: linear-gradient(249deg, #dcee5c, #51e1cc);
-  align-items: center;
-  justify-content: center;
-  display: flex;
-  margin-bottom: 50px;
-  font-size: 7em;
-  color: #fff;
-  text-shadow: 0px 10px 20px #000;
-  width: 100%;
-
-  @media (max-width: 800px) {
-    height: 150px;
-    font-size: 4em;
-  }
-
-  @media (max-width: 520px) {
-    margin-bottom: 20px;
-  }
-`
-
-const Grid = styled.div`
-  display: grid;
-  justify-items: center;
-  justify-content: space-evenly;
-
-  grid-row-gap: 30px;
-
-  grid-template-columns: repeat(2, 1fr);
-  grid-column-gap: 5px;
-
-  ${q(500)} {
-    grid-template-columns: repeat(4, 235px);
-    grid-column-gap: 40px;
-  }
-`
-
-const ParentBox = styled.div`
-  width: 100%;
-  border-radius: 15px;
-  text-transform: uppercase;
-  color: #fff;
-  font-weight: 700;
-  text-align: center;
-  padding: 10px;
-
-  @media (max-width: 500px) {
-    font-size: 0.8em;
-  }
-  @media (max-width: 400px) {
-    font-size: 0.6em;
-  }
-`
-
-const Box = styled(ParentBox)`
-  background: linear-gradient(325deg, #fe3e2a, #fb3232);
-  box-shadow: 0px 20px 0px 0px #dedede;
-  cursor: pointer;
-  transition: all 0.5s ease;
-
-  &:hover {
-    box-shadow: 0px 40px 0px 0px #dedede;
-    & > div:nth-of-type(2) {
-      letter-spacing: 0.05em;
-      text-shadow: 0 6px 0px #000;
-    }
-  }
-
-  & > div:nth-of-type(1) {
-    font-size: 1.6em;
-    color: #000;
-  }
-  & > div:nth-of-type(2) {
-    transition: all 0.5s ease;
-    font-size: 4em;
-  }
-  & > div:nth-of-type(3) {
-    font-size: 1.2em;
-  }
-`
-
-const Box2 = styled(ParentBox)`
-  background: #7b7b7b;
-  box-shadow: 0px 10px 0px 0px #ffcdcd;
-`
-
-const Text = styled.div`
-  width: 100%;
-  margin: 40px 20px 20px 20px;
-  display: flex;
-  justify-content: center;
-
-  @media (max-width: 800px), (max-height: 800px) {
-    margin: 40px 0px 20px 0px;
-  }
-
-  & > h1 {
-    font-size: 2em;
-    line-height: 1.3em;
-    /* font-variant-caps: small-caps; */
-    text-transform: uppercase;
-    font-weight: 700;
-    background-color: #efefef;
-    background: linear-gradient(325deg, #fe3e2a, #fb3232);
-    border-radius: 15px;
-    padding: 40px;
-    margin: 80px 0;
-    color: #c3c3c3;
-
-    @media (max-width: 800px), (max-height: 800px) {
-      font-size: 1.5em;
-      padding: 10px;
-    }
-
-    display: unset;
-    font-weight: unset;
-    margin-block-start: unset;
-    margin-block-end: unset;
-    margin-inline-start: unset;
-    margin-inline-end: unset;
-
-    & > em {
-      display: block;
-      font-size: 1.3em;
-      font-weight: 700;
-      font-style: normal;
-      border-radius: 8px;
-      color: #fff;
-      text-shadow: 10px 0px 1px #ff0000bf;
-      letter-spacing: -0.025em;
-      background: unset;
-    }
-
-    & > span {
-      font-size: 1.3em;
-      font-weight: 700;
-      font-style: normal;
-      padding: 0 5px;
-      border-radius: 8px;
-      color: #fff;
-      letter-spacing: -0.025em;
-    }
-  }
-`
-
-const Title = styled.div`
-  background-color: #a2a2a2;
-  padding: 10px 40px 20px 40px;
-  margin: 40px;
-  margin-top: 0px;
-  color: #fff;
-  font-size: 1.2em;
-  font-weight: 700;
-  border-radius: 8px;
-  letter-spacing: -0.025em;
-  min-width: 400px;
-
-  & > div {
-    margin-top: 5px;
-  }
-
-  @media (max-width: 500px) {
-    display: none;
   }
 `

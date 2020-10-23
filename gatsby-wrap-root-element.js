@@ -1,6 +1,6 @@
 import React from 'react'
 import { ProvideTheme } from './src/components/theme/provider'
-import '@openfonts/kulim-park_latin'
+import 'fontsource-staatliches'
 
 /*
  Because wrapRootElement doesn’t render when the page changes it’s a good fit for context providers...
