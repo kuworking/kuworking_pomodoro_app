@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Global, css } from '@emotion/core'
 import styled from '@emotion/styled'
 
+import { Insomnia } from '@ionic-native/insomnia'
 import { ThemeSwitch } from './theme/themeswitch'
 
 const GlobalStyles = () => (
@@ -104,6 +105,11 @@ const Tool = () => {
     } catch (e) {}
   }, [audio])
 
+  useEffect(() => {
+    Insomnia.keepAwake()
+    return () => Insomnia.allowSleepAgain()
+  }, [])
+
   const radio_select = value => {
     setChecked(value)
     let new_audio = new Audio('audio/chime0' + value + '.mp3') // need to be loaded here that tab is for sure active
@@ -177,7 +183,7 @@ const qq = u => `@media (max-width: ${u}px)`
 
 const Layout = styled.main`
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: center;
   height: 100vh;
 
