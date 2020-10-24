@@ -1,0 +1,12 @@
+{
+  "appId": "com.example.kuworking_pomodoro",
+  "appName": "Kuworking Pomodoro",
+  "bundledWebRuntime": false,
+  "npmClient": "yarn",
+  "webDir": "public",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    }
+  }
+}
