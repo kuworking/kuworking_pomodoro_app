@@ -36,6 +36,7 @@ const useInterval = (callback, delay) => {
   // Remember the latest callback, and executes
   useEffect(() => {
     savedCallback.current = callback
+    Insomnia.keepAwake()
   }, [callback]) // re-run when callback changes
 
   // Set up the interval.
@@ -104,11 +105,6 @@ const Tool = () => {
       audio.play()
     } catch (e) {}
   }, [audio])
-
-  useEffect(() => {
-    Insomnia.keepAwake()
-    return () => Insomnia.allowSleepAgain()
-  }, [])
 
   const radio_select = value => {
     setChecked(value)
