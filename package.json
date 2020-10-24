@@ -9,6 +9,10 @@
     "url": "https://github.com/kuworking/kuworking_pomodoro_app.git"
   },
   "dependencies": {
+    "@capacitor/android": "2.4.2",
+    "@capacitor/cli": "2.4.2",
+    "@capacitor/core": "2.4.2",
+    "@capacitor/ios": "2.4.2",
     "@emotion/core": "10.0.35",
     "@emotion/styled": "10.0.27",
     "emotion-theming": "10.0.27",
