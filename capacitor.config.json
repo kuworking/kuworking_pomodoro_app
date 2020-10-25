@@ -8,5 +8,6 @@
     "SplashScreen": {
       "launchShowDuration": 0
     }
-  }
+  },
+  "cordova": {}
 }
